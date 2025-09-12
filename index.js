@@ -46,7 +46,7 @@ app.use((error, req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the PlanNest API!');
+    res.send('Welcome to the Notes Vault API!');
 });
 
 
