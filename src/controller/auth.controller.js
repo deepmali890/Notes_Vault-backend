@@ -100,7 +100,6 @@ exports.login = async (req, res) => {
             token,
             success: true,
             user
-
         });
 
 
@@ -136,10 +135,24 @@ exports.getUser = async (req, res) => {
     }
 }
 
-exports.logout = (req, res) => {
-    res.clearCookie("token");
-    res.status(200).json({
-        message: "Logout successful.",
-        success: true
-    });
-}
+exports.logout = async (req, res) => {
+    try {
+        // Clear the cookie
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        });
+
+        res.status(200).json({
+            message: 'Logged out successfully',
+            success: true
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({
+            message: 'Server error during logout',
+            success: false
+        });
+    }
+};
