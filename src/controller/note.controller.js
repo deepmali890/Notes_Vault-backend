@@ -27,7 +27,7 @@ exports.editNote = async (req, res) => {
     const noteId = req.params.id;
     const { title, content, tags, isPinned } = req.body;
 
-    if (!title && !content && !tags && !isPinned) {
+    if (!title && !content && !tags && isPinned === undefined) {
         return res.status(400).json({ message: 'At least one field is required' });
     }
     try {
