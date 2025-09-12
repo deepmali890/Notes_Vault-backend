@@ -15,7 +15,7 @@ const noteRoutes = require('./src/routes/note.routes');
 const app = express();
 
 const corsOptions = {
-    origin: 'https://notes-vaults.netlify.app/',
+    origin: 'https://notes-vaults.netlify.app',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
