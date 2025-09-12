@@ -74,3 +74,28 @@ exports.deleteNote = async (req, res) => {
         res.status(500).json({ message: 'Internal server error', success: false });
     }
 }
+exports.searchNotes = async (req, res) => {
+    const user = req.user;
+    const { query } = req.query;
+
+    if (!query) {
+        return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    try {
+        const matchingNotes = await Note.find({
+            user: user._id,
+            $or: [
+                { title: { $regex: query, $options: 'i' } },
+                { content: { $regex: query, $options: 'i' } },
+                { tags: { $regex: query, $options: 'i' } }
+            ]
+        });
+        res.status(200).json({ message: 'Notes fetched successfully', notes: matchingNotes, success: true });
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Internal server error', success: false });
+    }
+}
