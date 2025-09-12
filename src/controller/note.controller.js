@@ -27,28 +27,33 @@ exports.editNote = async (req, res) => {
     const noteId = req.params.id;
     const { title, content, tags, isPinned } = req.body;
 
-    if (!title && !content && !tags && isPinned === undefined) {
+    // At least one field should be provided
+    if (title === undefined && content === undefined && tags === undefined && isPinned === undefined) {
         return res.status(400).json({ message: 'At least one field is required' });
     }
+
     try {
-        const note = await Note.findById(noteId)
+        const note = await Note.findById(noteId);
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
 
-        if (title) note.title = title;
-        if (content) note.content = content;
-        if (tags) note.tags = tags;
+        // Update only provided fields
+        if (title !== undefined) note.title = title;
+        if (content !== undefined) note.content = content;
+        if (tags !== undefined) note.tags = tags;
         if (isPinned !== undefined) note.isPinned = isPinned;
+
         await note.save();
+
         res.status(200).json({ message: 'Note updated successfully', note, success: true });
 
     } catch (error) {
-        console.log(error)
+        console.error(error);
         res.status(500).json({ message: 'Internal server error', success: false });
-
     }
-}
+};
+
 
 exports.getAllNotes = async (req, res) => {
     try {
