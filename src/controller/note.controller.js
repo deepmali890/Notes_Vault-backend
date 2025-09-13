@@ -57,7 +57,7 @@ exports.editNote = async (req, res) => {
 
 exports.getAllNotes = async (req, res) => {
     try {
-        const notes = await Note.find().sort({ isPinned: -1 });
+        const notes = await Note.find({ user: user._id }).sort({ isPinned: -1 });
         res.status(200).json({ message: 'Notes fetched successfully', notes, success: true });
     } catch (error) {
         console.log(error)
@@ -67,8 +67,9 @@ exports.getAllNotes = async (req, res) => {
 
 exports.deleteNote = async (req, res) => {
     const noteId = req.params.id
+    const user = req.user;
     try {
-        const note = await Note.findById(noteId)
+        const note = await Note.findOne({ _id: noteId, user: user._id })
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
