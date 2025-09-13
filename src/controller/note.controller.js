@@ -2,7 +2,6 @@ const Note = require("../model/note.model");
 
 exports.addNote = async (req, res) => {
     const { title, content, tags } = req.body;
-    const user = req.user;
     if (!title || !content) {
         return res.status(400).json({ message: 'Title and content are required' });
     }
@@ -11,7 +10,8 @@ exports.addNote = async (req, res) => {
             title,
             content,
             tags: tags || [],
-            user: user._id
+            user: req.user._id
+
         })
         await note.save();
         res.status(201).json({ message: 'Note added successfully', note, success: true });
@@ -33,7 +33,7 @@ exports.editNote = async (req, res) => {
     }
 
     try {
-        const note = await Note.findById(noteId);
+        const note = await Note.findOne({ _id: noteId, user: req.user._id });
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
@@ -57,7 +57,7 @@ exports.editNote = async (req, res) => {
 
 exports.getAllNotes = async (req, res) => {
     try {
-        const notes = await Note.find({ user: user._id }).sort({ isPinned: -1 });
+        const notes = await Note.find({ user: req.user._id }).sort({ isPinned: -1 });
         res.status(200).json({ message: 'Notes fetched successfully', notes, success: true });
     } catch (error) {
         console.log(error)
@@ -69,7 +69,7 @@ exports.deleteNote = async (req, res) => {
     const noteId = req.params.id
     const user = req.user;
     try {
-        const note = await Note.findOne({ _id: noteId, user: user._id })
+        const note = await Note.findOne({ _id: noteId, user: req.user._id })
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
@@ -81,7 +81,6 @@ exports.deleteNote = async (req, res) => {
     }
 }
 exports.searchNotes = async (req, res) => {
-    const user = req.user;
     const { query } = req.query;
 
     if (!query) {
@@ -90,7 +89,7 @@ exports.searchNotes = async (req, res) => {
 
     try {
         const matchingNotes = await Note.find({
-            user: user._id,
+            user: req.user._id,
             $or: [
                 { title: { $regex: query, $options: 'i' } },
                 { content: { $regex: query, $options: 'i' } },
